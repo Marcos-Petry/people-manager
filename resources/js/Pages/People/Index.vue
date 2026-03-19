@@ -1,0 +1,135 @@
+<script setup>
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+import PrimaryButton from '@/Components/PrimaryButton.vue'
+import SecondaryButton from '@/Components/SecondaryButton.vue'
+import DangerButton from '@/Components/DangerButton.vue'
+import { Head, Link, router } from '@inertiajs/vue3'
+import { formatCpf, formatPhone } from '@/utils/formatters'
+import Pagination from '@/Components/Pagination.vue'
+
+defineProps({
+  people: Object,
+})
+
+const destroyPerson = (person) => {
+  if (confirm(`Tem certeza que deseja excluir ${person.name}?`)) {
+    router.delete(route('people.destroy', person.id))
+  }
+}
+</script>
+
+<template>
+
+  <Head title="Pessoas" />
+
+  <AuthenticatedLayout>
+    <div class="py-8">
+      <div class="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl font-semibold text-gray-900">Consulta de Pessoas</h1>
+            <p class="mt-1 text-sm text-gray-500">
+              Gerencie o cadastro de pessoas físicas e jurídicas.
+            </p>
+          </div>
+
+          <Link :href="route('people.create')">
+            <PrimaryButton>
+              Cadastrar pessoa
+            </PrimaryButton>
+          </Link>
+        </div>
+
+        <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+          <div v-if="people.data.length" class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="table-th">
+                    Nome
+                  </th>
+                  <th class="table-th">
+                    CPF
+                  </th>
+                  <th class="table-th">
+                    Tipo
+                  </th>
+                  <th class="table-th">
+                    Telefone
+                  </th>
+                  <th class="table-th">
+                    E-mail
+                  </th>
+                  <th class="table-th !text-right">
+                    Ações
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody class="divide-y divide-gray-200 bg-white">
+                <tr v-for="person in people.data" :key="person.id" class="hover:bg-gray-50">
+                  <td class="table-td">
+                    {{ person.name }}
+                  </td>
+
+                  <td class="table-td">
+                    {{ formatCpf(person.cpf) }}
+                  </td>
+
+                  <td class="table-td">
+                    {{ person.type === 'fisica' ? 'Física' : 'Jurídica' }}
+                  </td>
+
+                  <td class="table-td">
+                    {{ formatPhone(person.phone) }}
+                  </td>
+
+                  <td class="table-td-email">
+                    {{ person.email }}
+                  </td>
+
+                  <td class="whitespace-nowrap px-6 py-4 text-right text-sm">
+                    <div class="flex justify-end gap-2">
+                      <Link :href="route('people.edit', person.id)">
+                        <SecondaryButton class="!px-3 !py-1.5 !text-xs" type="button">
+                          Editar
+                        </SecondaryButton>
+                      </Link>
+
+                      <DangerButton class="!px-3 !py-1.5 !text-xs" type="button" @click="destroyPerson(person)">
+                        Excluir
+                      </DangerButton>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div v-else class="px-6 py-12 text-center">
+            <p class="text-sm text-gray-500">
+              Nenhum registro encontrado
+            </p>
+          </div>
+        </div>
+
+        <Pagination :links="people.links" :total="people.total" :current-page="people.current_page"
+          :last-page="people.last_page" />
+      </div>
+    </div>
+  </AuthenticatedLayout>
+</template>
+
+<style scoped lang="postcss">
+.table-th {
+  @apply px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500;
+}
+
+.table-td {
+  @apply whitespace-nowrap px-6 py-4 text-sm text-gray-700;
+}
+
+.table-td-email {
+  @apply px-6 py-4 text-sm text-gray-700;
+}
+</style>
