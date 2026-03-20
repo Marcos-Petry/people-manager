@@ -6,6 +6,7 @@ import DangerButton from '@/Components/DangerButton.vue'
 import { Head, Link, router } from '@inertiajs/vue3'
 import { formatCpf, formatPhone } from '@/utils/formatters'
 import Pagination from '@/Components/Pagination.vue'
+import { EyeIcon, PencilSquareIcon, TrashIcon } from '@heroicons/vue/24/outline'
 
 defineProps({
   people: Object,
@@ -90,15 +91,25 @@ const destroyPerson = (person) => {
 
                   <td class="whitespace-nowrap px-6 py-4 text-right text-sm">
                     <div class="flex justify-end gap-2">
-                      <Link :href="route('people.edit', person.id)">
-                        <SecondaryButton class="!px-3 !py-1.5 !text-xs" type="button">
-                          Editar
-                        </SecondaryButton>
+
+                      <Link :href="route('people.show', person.id)"
+                        class="rounded-md p-1.5 text-brand/80 transition hover:bg-brand-light hover:text-brand"
+                        title="Visualizar">
+                        <EyeIcon class="h-5 w-5" />
                       </Link>
 
-                      <DangerButton class="!px-3 !py-1.5 !text-xs" type="button" @click="destroyPerson(person)">
-                        Excluir
-                      </DangerButton>
+                      <Link :href="route('people.edit', person.id)"
+                        class="rounded-md p-1.5 text-gray-600 transition hover:bg-gray-100 hover:text-gray-900"
+                        title="Editar">
+                        <PencilSquareIcon class="h-5 w-5" />
+                      </Link>
+
+                      <button type="button" @click="destroyPerson(person)"
+                        class="rounded-md p-1.5 text-red-500 transition hover:bg-red-50 hover:text-red-600"
+                        title="Excluir">
+                        <TrashIcon class="h-5 w-5" />
+                      </button>
+
                     </div>
                   </td>
                 </tr>
