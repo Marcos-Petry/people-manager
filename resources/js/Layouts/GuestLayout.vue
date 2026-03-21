@@ -1,22 +1,20 @@
 <script setup>
-import ApplicationLogo from '@/Components/ApplicationLogo.vue';
-import { Link } from '@inertiajs/vue3';
+import AppHeader from '@/Layouts/Partials/AppHeader.vue'
+import AppFooter from '@/Layouts/Partials/AppFooter.vue'
 </script>
 
 <template>
-    <div
-        class="flex min-h-screen flex-col items-center bg-gray-100 pt-6 sm:justify-center sm:pt-0"
-    >
-        <div>
-            <Link href="/">
-                <ApplicationLogo class="h-20 w-20 fill-current text-gray-500" />
-            </Link>
-        </div>
+    <div class="flex min-h-screen flex-col bg-gray-50">
 
-        <div
-            class="mt-6 w-full overflow-hidden bg-white px-6 py-4 shadow-md sm:max-w-md sm:rounded-lg"
-        >
-            <slot />
-        </div>
+        <AppHeader />
+
+        <main class="flex flex-1 items-center justify-center px-6 py-10">
+            <div class="w-full max-w-md rounded-2xl border border-gray-200 bg-white px-8 py-8 shadow-sm">
+                <slot />
+            </div>
+        </main>
+
+        <AppFooter />
+
     </div>
 </template>

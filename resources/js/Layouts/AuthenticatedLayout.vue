@@ -1,11 +1,11 @@
 <script setup>
 import { ref, watch } from 'vue'
-import ApplicationLogo from '@/Components/ApplicationLogo.vue'
 import Dropdown from '@/Components/Dropdown.vue'
 import DropdownLink from '@/Components/DropdownLink.vue'
 import NavLink from '@/Components/NavLink.vue'
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue'
 import { Link, usePage } from '@inertiajs/vue3'
+import AppFooter from '@/Layouts/Partials/AppFooter.vue'
 
 const showingNavigationDropdown = ref(false)
 
@@ -32,25 +32,15 @@ watch(
 </script>
 
 <template>
-    <div class="min-h-screen bg-gray-100">
+    <div class="min-h-screen bg-gray-100 flex flex-col">
         <!-- NAVBAR -->
-        <nav class="border-b border-gray-100 bg-white">
+        <nav class="border-b border-gray-200 bg-white shadow-sm">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div class="flex h-16 justify-between">
-                    <div class="flex">
-                        <!-- LOGO -->
-                        <div class="flex shrink-0 items-center">
-                            <Link :href="route('people.index')">
-                                <ApplicationLogo class="block h-9 w-auto fill-current text-gray-800" />
-                            </Link>
-                        </div>
-
-                        <!-- MENU -->
-                        <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                            <NavLink :href="route('people.index')" :active="route().current('people.*')">
-                                Pessoas
-                            </NavLink>
-                        </div>
+                    <div class="flex items-center">
+                        <Link :href="route('people.index')" class="text-lg font-semibold text-gray-900">
+                            Gerenciador de Pessoas
+                        </Link>
                     </div>
 
                     <!-- USER DROPDOWN -->
@@ -58,7 +48,7 @@ watch(
                         <Dropdown align="right" width="48">
                             <template #trigger>
                                 <button type="button"
-                                    class="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-medium text-gray-500 hover:text-gray-700 focus:outline-none">
+                                    class="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium text-gray-600 transition duration-150 ease-in-out hover:text-gray-800 focus:outline-none">
                                     {{ $page.props.auth.user.name }}
 
                                     <svg class="ms-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
@@ -85,12 +75,16 @@ watch(
                     <!-- HAMBURGER -->
                     <div class="-me-2 flex items-center sm:hidden">
                         <button @click="showingNavigationDropdown = !showingNavigationDropdown"
-                            class="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500">
+                            class="inline-flex items-center justify-center rounded-md p-2 text-gray-400 transition duration-150 ease-in-out hover:bg-gray-100 hover:text-gray-500 focus:outline-none">
                             <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                                <path :class="{ hidden: showingNavigationDropdown }" stroke-linecap="round"
-                                    stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                                <path :class="{ hidden: !showingNavigationDropdown }" stroke-linecap="round"
-                                    stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                <path
+                                    :class="{ hidden: showingNavigationDropdown, 'inline-flex': !showingNavigationDropdown }"
+                                    stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 6h16M4 12h16M4 18h16" />
+                                <path
+                                    :class="{ hidden: !showingNavigationDropdown, 'inline-flex': showingNavigationDropdown }"
+                                    stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </button>
                     </div>
@@ -101,14 +95,21 @@ watch(
             <div :class="{
                 block: showingNavigationDropdown,
                 hidden: !showingNavigationDropdown,
-            }" class="sm:hidden">
-                <ResponsiveNavLink :href="route('people.index')" :active="route().current('people.*')">
-                    Pessoas
-                </ResponsiveNavLink>
+            }" class="border-t border-gray-200 bg-white sm:hidden">
+                <div class="space-y-1 pb-3 pt-2">
+                    <ResponsiveNavLink :href="route('people.index')" :active="route().current('people.*')">
+                        Pessoas
+                    </ResponsiveNavLink>
+                </div>
 
-                <div class="border-t border-gray-200 pt-4">
-                    <div class="px-4 text-sm text-gray-600">
-                        {{ $page.props.auth.user.email }}
+                <div class="border-t border-gray-200 pb-3 pt-4">
+                    <div class="px-4">
+                        <div class="text-base font-medium text-gray-800">
+                            {{ $page.props.auth.user.name }}
+                        </div>
+                        <div class="text-sm font-medium text-gray-500">
+                            {{ $page.props.auth.user.email }}
+                        </div>
                     </div>
 
                     <div class="mt-3 space-y-1">
@@ -134,7 +135,7 @@ watch(
                     class="flex items-start justify-between rounded-md border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800 shadow-lg">
                     <span>{{ $page.props.flash.success }}</span>
 
-                    <button class="ml-4 text-green-700 hover:text-green-900" @click="showFlash = false">
+                    <button class="ml-4 text-green-700 transition hover:text-green-900" @click="showFlash = false">
                         ✕
                     </button>
                 </div>
@@ -142,8 +143,10 @@ watch(
         </transition>
 
         <!-- PAGE CONTENT -->
-        <main>
+        <main class="flex-1">
             <slot />
         </main>
+
+        <AppFooter />
     </div>
 </template>

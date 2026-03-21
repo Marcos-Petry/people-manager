@@ -1,8 +1,10 @@
 <script setup>
+import { ref } from 'vue'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import PrimaryButton from '@/Components/PrimaryButton.vue'
 import SecondaryButton from '@/Components/SecondaryButton.vue'
 import DangerButton from '@/Components/DangerButton.vue'
+import Modal from '@/Components/Modal.vue'
 import { Head, Link, router } from '@inertiajs/vue3'
 import { formatCpf, formatPhone } from '@/utils/formatters'
 import Pagination from '@/Components/Pagination.vue'
@@ -12,10 +14,29 @@ defineProps({
   people: Object,
 })
 
-const destroyPerson = (person) => {
-  if (confirm(`Tem certeza que deseja excluir ${person.name}?`)) {
-    router.delete(route('people.destroy', person.id))
-  }
+const personToDelete = ref(null)
+const isDeleting = ref(false)
+
+const openDeleteModal = (person) => {
+  personToDelete.value = person
+}
+
+const closeDeleteModal = () => {
+  if (isDeleting.value) return
+  personToDelete.value = null
+}
+
+const confirmDelete = () => {
+  if (!personToDelete.value) return
+
+  isDeleting.value = true
+
+  router.delete(route('people.destroy', personToDelete.value.id), {
+    onFinish: () => {
+      isDeleting.value = false
+      personToDelete.value = null
+    },
+  })
 }
 </script>
 
@@ -104,7 +125,7 @@ const destroyPerson = (person) => {
                         <PencilSquareIcon class="h-5 w-5" />
                       </Link>
 
-                      <button type="button" @click="destroyPerson(person)"
+                      <button type="button" @click="openDeleteModal(person)"
                         class="rounded-md p-1.5 text-red-500 transition hover:bg-red-50 hover:text-red-600"
                         title="Excluir">
                         <TrashIcon class="h-5 w-5" />
@@ -128,6 +149,35 @@ const destroyPerson = (person) => {
           :last-page="people.last_page" />
       </div>
     </div>
+
+    <Modal :show="!!personToDelete" @close="closeDeleteModal">
+      <div class="p-6">
+        <h2 class="text-lg font-semibold text-gray-900">
+          Excluir pessoa
+        </h2>
+
+        <p class="mt-2 text-sm text-gray-600">
+          Tem certeza que deseja excluir
+          <span class="font-medium text-gray-900">
+            {{ personToDelete?.name }}
+          </span>?
+        </p>
+
+        <p class="mt-2 text-sm text-gray-500">
+          Esta ação não poderá ser desfeita.
+        </p>
+
+        <div class="mt-6 flex justify-end gap-3">
+          <SecondaryButton @click="closeDeleteModal" :disabled="isDeleting">
+            Cancelar
+          </SecondaryButton>
+
+          <DangerButton @click="confirmDelete" :disabled="isDeleting">
+            Excluir pessoa
+          </DangerButton>
+        </div>
+      </div>
+    </Modal>
   </AuthenticatedLayout>
 </template>
 
