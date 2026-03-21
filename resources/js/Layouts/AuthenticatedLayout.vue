@@ -48,10 +48,15 @@ watch(
                         <Dropdown align="right" width="48">
                             <template #trigger>
                                 <button type="button"
-                                    class="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium text-gray-600 transition duration-150 ease-in-out hover:text-gray-800 focus:outline-none">
-                                    {{ $page.props.auth.user.name }}
+                                    class="inline-flex items-center gap-3 rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium text-gray-600 transition duration-150 ease-in-out hover:text-gray-800 focus:outline-none">
+                                    <span
+                                        class="flex h-8 w-8 items-center justify-center rounded-full bg-brand text-sm font-semibold text-white">
+                                        {{ $page.props.auth.user.name.charAt(0).toUpperCase() }}
+                                    </span>
 
-                                    <svg class="ms-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                    <span>{{ $page.props.auth.user.name }}</span>
+
+                                    <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                                         fill="currentColor">
                                         <path fill-rule="evenodd"
                                             d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
@@ -96,11 +101,6 @@ watch(
                 block: showingNavigationDropdown,
                 hidden: !showingNavigationDropdown,
             }" class="border-t border-gray-200 bg-white sm:hidden">
-                <div class="space-y-1 pb-3 pt-2">
-                    <ResponsiveNavLink :href="route('people.index')" :active="route().current('people.*')">
-                        Pessoas
-                    </ResponsiveNavLink>
-                </div>
 
                 <div class="border-t border-gray-200 pb-3 pt-4">
                     <div class="px-4">

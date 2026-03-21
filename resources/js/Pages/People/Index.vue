@@ -1,21 +1,95 @@
 <script setup>
 import { ref } from 'vue'
+import { Head, Link, router } from '@inertiajs/vue3'
+import { EyeIcon, PencilSquareIcon, TrashIcon, PlusIcon, XMarkIcon } from '@heroicons/vue/24/outline'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import PrimaryButton from '@/Components/PrimaryButton.vue'
 import SecondaryButton from '@/Components/SecondaryButton.vue'
 import DangerButton from '@/Components/DangerButton.vue'
 import Modal from '@/Components/Modal.vue'
-import { Head, Link, router } from '@inertiajs/vue3'
-import { formatCpf, formatPhone } from '@/utils/formatters'
 import Pagination from '@/Components/Pagination.vue'
-import { EyeIcon, PencilSquareIcon, TrashIcon } from '@heroicons/vue/24/outline'
+import { formatCpf, formatPhone } from '@/utils/formatters'
 
-defineProps({
+const props = defineProps({
   people: Object,
+  filters: {
+    type: Array,
+    default: () => [],
+  },
 })
+
+const DEFAULT_FILTER = () => ({
+  field: 'name',
+  operator: 'contains',
+  value: '',
+})
+
+const normalizeFilter = (filter = {}) => ({
+  field: filter.field ?? 'name',
+  operator: filter.operator ?? 'contains',
+  value: filter.value ?? '',
+})
+
+const filterFields = [
+  { value: 'name', label: 'Nome' },
+  { value: 'cpf', label: 'CPF' },
+  { value: 'type', label: 'Tipo' },
+  { value: 'phone', label: 'Telefone' },
+  { value: 'email', label: 'E-mail' },
+]
+
+const filterOperators = [
+  { value: 'contains', label: 'Contém' },
+  { value: 'equals', label: 'Igual a' },
+  { value: 'starts_with', label: 'Começa com' },
+  { value: 'ends_with', label: 'Termina com' },
+]
 
 const personToDelete = ref(null)
 const isDeleting = ref(false)
+
+const filters = ref(
+  props.filters.length
+    ? props.filters.map(normalizeFilter)
+    : [DEFAULT_FILTER()]
+)
+
+const addFilterRow = () => {
+  filters.value.push(DEFAULT_FILTER())
+}
+
+const removeFilterRow = (index) => {
+  if (filters.value.length === 1) {
+    filters.value = [DEFAULT_FILTER()]
+    return
+  }
+
+  filters.value.splice(index, 1)
+}
+
+const applyFilters = () => {
+  const validFilters = filters.value
+    .map((filter) => ({
+      field: filter.field ?? 'name',
+      operator: filter.operator ?? 'contains',
+      value: String(filter.value ?? '').trim(),
+    }))
+    .filter((filter) => filter.value !== '')
+
+  const params = new URLSearchParams()
+
+  validFilters.forEach((filter, index) => {
+    params.append(`filters[${index}][field]`, filter.field)
+    params.append(`filters[${index}][operator]`, filter.operator)
+    params.append(`filters[${index}][value]`, filter.value)
+  })
+
+  window.location.href = `${route('people.index')}?${params.toString()}`
+}
+
+const clearFilters = () => {
+  window.location.href = route('people.index')
+}
 
 const openDeleteModal = (person) => {
   personToDelete.value = person
@@ -62,6 +136,49 @@ const confirmDelete = () => {
           </Link>
         </div>
 
+        <div class="max-w-4xl space-y-2">
+          <div v-for="(filter, index) in filters" :key="index" class="flex items-center gap-2">
+            <select v-model="filter.field"
+              class="h-8 w-40 rounded-md border border-gray-300 bg-white px-2 text-sm text-gray-700 outline-none focus:border-brand focus:ring-1 focus:ring-brand">
+              <option v-for="field in filterFields" :key="field.value" :value="field.value">
+                {{ field.label }}
+              </option>
+            </select>
+
+            <select v-model="filter.operator"
+              class="h-8 w-32 rounded-md border border-gray-300 bg-white px-2 text-sm text-gray-700 outline-none focus:border-brand focus:ring-1 focus:ring-brand">
+              <option v-for="operator in filterOperators" :key="operator.value" :value="operator.value">
+                {{ operator.label }}
+              </option>
+            </select>
+
+            <input v-model="filter.value" type="text" placeholder="Valor"
+              class="h-8 w-60 rounded-md border border-gray-300 bg-white px-2 text-sm text-gray-700 outline-none focus:border-brand focus:ring-1 focus:ring-brand" />
+
+            <button v-if="index === filters.length - 1" type="button" @click="addFilterRow"
+              class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-gray-300 text-gray-500 transition hover:border-brand hover:text-brand"
+              title="Adicionar filtro">
+              <PlusIcon class="h-4 w-4" />
+            </button>
+
+            <button type="button" @click="removeFilterRow(index)"
+              class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-gray-300 text-gray-500 transition hover:border-red-500 hover:text-red-500"
+              title="Remover filtro">
+              <XMarkIcon class="h-4 w-4" />
+            </button>
+
+            <button v-if="index === filters.length - 1" type="button" @click="applyFilters"
+              class="inline-flex h-8 items-center rounded-md border border-gray-300 bg-white px-3 text-sm font-medium text-gray-600 transition hover:border-brand hover:text-brand">
+              Filtrar
+            </button>
+
+            <button v-if="index === filters.length - 1" type="button" @click="clearFilters"
+              class="inline-flex h-8 items-center rounded-md border border-gray-300 bg-white px-3 text-sm font-medium text-gray-600 transition hover:border-brand hover:text-brand">
+              Limpar
+            </button>
+          </div>
+        </div>
+
         <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
           <div v-if="people.data.length" class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
@@ -91,7 +208,9 @@ const confirmDelete = () => {
               <tbody class="divide-y divide-gray-200 bg-white">
                 <tr v-for="person in people.data" :key="person.id" class="hover:bg-gray-50">
                   <td class="table-td">
-                    {{ person.name }}
+                    <div class="max-w-xs truncate" :title="person.name">
+                      {{ person.name }}
+                    </div>
                   </td>
 
                   <td class="table-td">
@@ -112,7 +231,6 @@ const confirmDelete = () => {
 
                   <td class="whitespace-nowrap px-6 py-4 text-right text-sm">
                     <div class="flex justify-end gap-2">
-
                       <Link :href="route('people.show', person.id)"
                         class="rounded-md p-1.5 text-brand/80 transition hover:bg-brand-light hover:text-brand"
                         title="Visualizar">
@@ -130,7 +248,6 @@ const confirmDelete = () => {
                         title="Excluir">
                         <TrashIcon class="h-5 w-5" />
                       </button>
-
                     </div>
                   </td>
                 </tr>

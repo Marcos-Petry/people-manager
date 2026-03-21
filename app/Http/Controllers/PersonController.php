@@ -2,25 +2,28 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StorePersonRequest;
-use App\Http\Requests\UpdatePersonRequest;
-use App\Models\Person;
-use Illuminate\Http\Request;
-use Inertia\Inertia;
-use Symfony\Component\HttpFoundation\Response;
+use App\Filters\PersonFilter,
+    App\Http\Requests\PersonIndexRequest,
+    App\Http\Requests\StorePersonRequest,
+    App\Http\Requests\UpdatePersonRequest,
+    App\Models\Person,
+    Inertia\Inertia;
 
 class PersonController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(PersonIndexRequest $request, PersonFilter $personFilter)
     {
+        $filters = $request->validated('filters', []);
+
+        $people = $personFilter
+            ->apply(Person::query(), $filters)
+            ->orderBy('name')
+            ->paginate(10)
+            ->withQueryString();
+
         return Inertia::render('People/Index', [
-            'people' => Person::query()
-                ->latest()
-                ->paginate(10)
-                ->withQueryString(),
+            'people' => $people,
+            'filters' => $filters,
         ]);
     }
 
