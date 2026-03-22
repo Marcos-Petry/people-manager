@@ -106,17 +106,21 @@ CREATE DATABASE people_manager;
 php artisan migrate
 ```
 
-9. Iniciar o servidor backend
+9. Configuração de idioma
+
+- Para que as mensagens de autenticação e validação sejam exibidas em português, configure o locale da aplicação no arquivo `.env`:
+
+10. Iniciar o servidor backend
 ```bash
 php artisan serve
 ```
 
-10. Iniciar o servidor frontend com Vite
+11. Iniciar o servidor frontend com Vite
 ```bash
 npm run dev
 ```
 
-11. Acessar o sistema
+12. Acessar o sistema
 ```bash
 http://127.0.0.1:8000
 ```
