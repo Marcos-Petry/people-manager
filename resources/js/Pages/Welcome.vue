@@ -29,7 +29,7 @@ defineProps({
 
                     <div class="mt-6 flex gap-3">
                         <Link :href="route('login')"
-                            class="rounded-md bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-indigo-700">
+                            class="rounded-md bg-blue-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700">
                             Entrar
                         </Link>
 

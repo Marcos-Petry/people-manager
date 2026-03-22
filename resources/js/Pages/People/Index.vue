@@ -121,7 +121,9 @@ const confirmDelete = () => {
   <AuthenticatedLayout>
     <div class="py-8">
       <div class="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between">
+
+        <!-- HEADER -->
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 class="text-2xl font-semibold text-gray-900">Consulta de Pessoas</h1>
             <p class="mt-1 text-sm text-gray-500">
@@ -137,23 +139,23 @@ const confirmDelete = () => {
         </div>
 
         <div class="max-w-4xl space-y-2">
-          <div v-for="(filter, index) in filters" :key="index" class="flex items-center gap-2">
+          <div v-for="(filter, index) in filters" :key="index" class="flex flex-wrap items-center gap-2">
             <select v-model="filter.field"
-              class="h-8 w-40 rounded-md border border-gray-300 bg-white px-2 text-sm text-gray-700 outline-none focus:border-brand focus:ring-1 focus:ring-brand">
+              class="h-8 w-full sm:w-40 rounded-md border border-gray-300 bg-white px-2 text-sm text-gray-700 outline-none focus:border-brand focus:ring-1 focus:ring-brand">
               <option v-for="field in filterFields" :key="field.value" :value="field.value">
                 {{ field.label }}
               </option>
             </select>
 
             <select v-model="filter.operator"
-              class="h-8 w-32 rounded-md border border-gray-300 bg-white px-2 text-sm text-gray-700 outline-none focus:border-brand focus:ring-1 focus:ring-brand">
+              class="h-8 w-full sm:w-32 rounded-md border border-gray-300 bg-white px-2 text-sm text-gray-700 outline-none focus:border-brand focus:ring-1 focus:ring-brand">
               <option v-for="operator in filterOperators" :key="operator.value" :value="operator.value">
                 {{ operator.label }}
               </option>
             </select>
 
             <input v-model="filter.value" type="text" placeholder="Valor"
-              class="h-8 w-60 rounded-md border border-gray-300 bg-white px-2 text-sm text-gray-700 outline-none focus:border-brand focus:ring-1 focus:ring-brand" />
+              class="h-8 min-w-0 flex-1 rounded-md border border-gray-300 bg-white px-2 text-sm text-gray-700 outline-none focus:border-brand focus:ring-1 focus:ring-brand" />
 
             <button v-if="index === filters.length - 1" type="button" @click="addFilterRow"
               class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-gray-300 text-gray-500 transition hover:border-brand hover:text-brand"
@@ -181,25 +183,15 @@ const confirmDelete = () => {
 
         <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
           <div v-if="people.data.length" class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
+            <table class="min-w-[900px] w-full divide-y divide-gray-200">
               <thead class="bg-gray-50">
                 <tr>
-                  <th class="table-th">
-                    Nome
-                  </th>
-                  <th class="table-th">
-                    CPF
-                  </th>
-                  <th class="table-th">
-                    Tipo
-                  </th>
-                  <th class="table-th">
-                    Telefone
-                  </th>
-                  <th class="table-th">
-                    E-mail
-                  </th>
-                  <th class="table-th !text-right">
+                  <th class="table-th">Nome</th>
+                  <th class="table-th">CPF</th>
+                  <th class="table-th">Tipo</th>
+                  <th class="table-th">Telefone</th>
+                  <th class="table-th">E-mail</th>
+                  <th class="table-th !text-right sticky right-0 bg-gray-50 z-10">
                     Ações
                   </th>
                 </tr>
@@ -229,7 +221,8 @@ const confirmDelete = () => {
                     {{ person.email }}
                   </td>
 
-                  <td class="whitespace-nowrap px-6 py-4 text-right text-sm">
+                  <td
+                    class="whitespace-nowrap px-6 py-4 text-right text-sm sticky right-0 bg-white shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.1)]">
                     <div class="flex justify-end gap-2">
                       <Link :href="route('people.show', person.id)"
                         class="rounded-md p-1.5 text-brand/80 transition hover:bg-brand-light hover:text-brand"
